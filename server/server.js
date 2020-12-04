@@ -20,7 +20,7 @@ app.use(require('./routes/libros'));
 app.use(require('./routes/categoria.js'));
 app.use(require('./routes/libro_prestado'));
 
-mongoose.connect('mongodb://localhost:27017/cafeteria', {
+mongoose.connect('mongodb+srv://admin:Leoespro217@cluster0.2hoke.mongodb.net/libreria', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,
