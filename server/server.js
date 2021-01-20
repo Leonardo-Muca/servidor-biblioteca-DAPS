@@ -16,11 +16,11 @@ app.get('/', function (req, res) {
 });
 
 app.use(require('./routes/usuario'));
-app.use(require('./routes/libros'));
-app.use(require('./routes/categoria.js'));
-app.use(require('./routes/libro_prestado'));
+app.use(require('./routes/correos'));
+app.use(require('./routes/login'));
 
-mongoose.connect('mongodb+srv://admin:Leoespro217@cluster0.2hoke.mongodb.net/libreria', {
+
+mongoose.connect('mongodb://localhost:27017/aventonta', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
   useFindAndModify: false,

@@ -20,7 +20,7 @@ let usuarioSchema = new Schema({
         type:String,
         required:false
     },
-    role:{
+    tipo:{
         type:String,
         default: 'USER_ROLE'
     },
@@ -28,9 +28,9 @@ let usuarioSchema = new Schema({
         type: Boolean,
         default: true
     },
-    google:{
-        type: Boolean,
-        default: false
+    correo: {
+        type: Schema.Types.ObjectId,
+        ref: 'Correos'
     }
 });
 

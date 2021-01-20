@@ -2,9 +2,11 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
 const Usuario = require('../models/usuario');
+const Correo = require('../models/correos');
 const app = express();
+const jwt = require('jsonwebtoken');
 
-app.get('/usuario', function (req, res) {
+app.get('/usuario', verifyToken,function (req, res) {
   let desde = req.query.desde || 0;
   let hasta = req.query.hasta || 5;
 
@@ -60,26 +62,59 @@ app.post('/usuario', function (req, res) {//req = obtener datos mandados por el 
   let usr = new Usuario({
     nombre: body.nombre,
     email: body.email,
+    tipo: body.tipo,
     password: bcrypt.hashSync(body.password, 10)
   });
+  
+const token = jwt.sign({_id: usr._id}, 'secretKey')
 
-  usr.save((err, usrBD) => {
-    if (err) {
-      return res.status(400).json({
-        ok: false,
-        msg: 'Ocurrio un error',
-        err
+  Correo.find({'email': usr.email})
+  .exec((err, usuarios) => {
+    if(usuarios.length > 0){
+      usr.save((err, usrBD) => {
+        if (err) {
+          return res.status(400).json({
+            ok: false,
+            msg: 'Ocurrio un error',
+            err
+          });
+        }
+    
+        return res.json({
+          ok: true,
+          msg: 'Usuario insertado con exito',
+          usrBD,
+          token
+        });
       });
+    }else{
+      return res.status(400).json({
+        msg: 'Correo no registrado'
+      })
     }
 
-    return res.json({
-      ok: true,
-      msg: 'Usuario insertado con exito',
-      usrBD
-    });
-  });
-});
+  }
 
+  
+)});
+
+
+function verifyToken(req, res, next){
+  console.log(req.headers.authorization)
+    if(!req.headers.authorization){
+      return res.status(401).send(' Autentificacion necesaria ')
+    }
+
+    const token = req.headers.authorization.split(' ')[1]
+    if(token == 'null'){
+      return res.status(401).send(' Autentificacion necesaria ');
+    }
+
+    const payload = jwt.verify(token, 'secretKey')
+    req.userId = payload._id;
+    next();
+
+}
 // app.put('/usuario/:id', function (req, res) {//se pueden declara variables dentro de la url usadas para modificar
 //   let id = req.params.id;
 //   let body = _.pick(req.body, ['nombre', 'email']);
@@ -105,7 +140,7 @@ app.post('/usuario', function (req, res) {//req = obtener datos mandados por el 
 
 app.put('/modificarusuario/:id', function (req, res) {//se pueden declara variables dentro de la url usadas para modificar
   let id = req.params.id;
-  let body = _.pick(req.body, ['nombre', 'contraseña', 'email']);
+  let body = _.pick(req.body, ['nombre', 'contraseña', 'email','tipo']);
 
 
   Usuario.findByIdAndUpdate(id, body,
