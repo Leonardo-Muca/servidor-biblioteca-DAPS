@@ -29,4 +29,34 @@ app.get('/correo', function (req, res) {
     });
 });
 
+
+app.post('/correo', function (req, res) {//req = obtener datos mandados por el cliente, res = mandar una respuesta
+  let body = req.body;
+  console.log(body)
+  let cor = new Correo({
+
+    email: body.email
+  });
+  cor.save((err, correos) => {
+    if(correos.length > 0){
+      usr.save((err, corBD) => {
+        if (err) {
+          return res.status(400).json({
+            ok: false,
+            msg: 'Ocurrio un error',
+            err
+          });
+        }
+    
+        return res.json({
+          ok: true,
+          msg: 'Correo insertado con exito',
+          corBD
+        });
+      });
+    }
+
+  } 
+)});
+
 module.exports = app;

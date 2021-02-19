@@ -30,6 +30,30 @@ app.get('/usuario', verifyToken,function (req, res) {
       });
     });
 });
+app.get('/conductor', verifyToken,function (req, res) {
+  let desde = req.query.desde || 0;
+  let hasta = req.query.hasta || 5;
+
+  Usuario.find({ tipo: 'Tipo 2' })
+    .skip(Number(desde))
+    .limit(Number(hasta))
+    .exec((err, conductor) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'Ocurrio un error al moento de consultar',
+          err
+        });
+      }
+
+      res.json({
+        ok: true,
+        msg: 'Lista de usuarios obtenida con exito',
+        conteo: conductor.length,
+        conductor
+      });
+    });
+});
 
 app.get('/usuario/:id', function (req, res) {
   let desde = req.query.desde || 0;
@@ -63,6 +87,52 @@ app.post('/usuario', function (req, res) {//req = obtener datos mandados por el 
     nombre: body.nombre,
     email: body.email,
     tipo: body.tipo,
+    password: bcrypt.hashSync(body.password, 10)
+  });
+  
+const token = jwt.sign({_id: usr._id}, 'secretKey')
+
+  Correo.find({'email': usr.email})
+  .exec((err, usuarios) => {
+    if(usuarios.length > 0){
+      usr.save((err, usrBD) => {
+        if (err) {
+          return res.status(400).json({
+            ok: false,
+            msg: 'Ocurrio un error',
+            err
+          });
+        }
+    
+        return res.json({
+          ok: true,
+          msg: 'Usuario insertado con exito',
+          usrBD,
+          token
+        });
+      });
+    }else{
+      return res.status(400).json({
+        msg: 'Correo no registrado'
+      })
+    }
+
+  }
+
+  
+)});
+
+app.post('/conductor', function (req, res) {//req = obtener datos mandados por el cliente, res = mandar una respuesta
+  let body = req.body;
+  console.log(body)
+  let usr = new Usuario({
+    nombre: body.nombre,
+    email: body.email,
+    tipo: body.tipo,
+    placas: body.placas,
+    modelo: body.modelo,
+    celular: body.celular,
+    CURP: body.CURP,
     password: bcrypt.hashSync(body.password, 10)
   });
   

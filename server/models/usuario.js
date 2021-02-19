@@ -31,6 +31,18 @@ let usuarioSchema = new Schema({
     correo: {
         type: Schema.Types.ObjectId,
         ref: 'Correos'
+    },
+    placas: {
+        type:String
+    },
+    modelo:{
+        type:String
+    },
+    celular:{
+        type:Number
+    },
+    CURP: {
+        type:String
     }
 });
 
